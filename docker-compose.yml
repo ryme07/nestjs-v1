@@ -1,13 +1,12 @@
-version: "3.9"
-    
+version: '3.9'
 services:
   backend:
     build: .
     ports:
       - 8000:3000
-    volumes: 
+    volumes:
       - .:/app
-    depends_on: 
+    depends_on:
       - db
 
   db:
@@ -20,3 +19,5 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - .dbdata:/var/lib/mysql
+    ports:
+      - 33066:3306
