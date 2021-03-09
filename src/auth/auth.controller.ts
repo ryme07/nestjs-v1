@@ -1,10 +1,11 @@
 import { registerDto } from './models/register.dto';
 import { UserService } from './../user/user.service';
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Post, Req, Res, UseInterceptors } from '@nestjs/common';
 import * as bcrypt from "bcryptjs"
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from "express"
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller()
 export class AuthController {
 
@@ -21,7 +22,8 @@ export class AuthController {
         if (body.password !== body.password_confirm) {
             throw new BadRequestException('Password do not match');
         }
-        const hashed = await bcrypt.hash(body.password, 12)
+        const hashed = await bcrypt.hash(body.password, 12);
+
         return this.userService.create({
             first_name: body.first_name,
             last_name: body.last_name,
@@ -56,6 +58,7 @@ export class AuthController {
     }
 
     //AUTHENTICATED USER
+
 
     @Get('user')
     async user(@Req() request: Request) {
