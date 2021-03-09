@@ -1,13 +1,20 @@
 import { registerDto } from './models/register.dto';
 import { UserService } from './../user/user.service';
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Req, Res } from '@nestjs/common';
 import * as bcrypt from "bcryptjs"
+import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from "express"
 
 @Controller()
 export class AuthController {
 
-    constructor(private userService: UserService) { }
+    constructor(
+        private userService: UserService,
+        private jwtService: JwtService
+    ) { }
 
+
+    // register user with hashed password (bcrypt)
     @Post('register')
     async register(@Body() body: registerDto) {
 
@@ -21,5 +28,41 @@ export class AuthController {
             email: body.email,
             password: hashed
         })
+    }
+
+
+    //login user with compare user's password & use cookie with JWT
+    @Post('login')
+    async login(
+        @Body('email') email: string,
+        @Body('password') password: string,
+        @Res() response: Response
+    ) {
+        const user = await this.userService.findOne({ email });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        if (!await bcrypt.compare(password, user.password)) {
+            throw new BadRequestException('Invalid credentials');
+        }
+
+        const jwt = await this.jwtService.signAsync({ id: user.id })
+
+        response.cookie('jwt', jwt, { httpOnly: true })
+
+        return user;
+    }
+
+    //AUTHENTICATED USER
+
+    @Get('user')
+    async user(@Req() request: Request) {
+        const cookie = request.cookies['jwt']
+
+        const data = await this.jwtService.verifyAsync(cookie)
+
+        return this.userService.findOne({ id: data['id'] })
     }
 }
