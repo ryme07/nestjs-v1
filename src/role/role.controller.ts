@@ -15,7 +15,7 @@ export class RoleController {
 
     @Get(":id")
     async getById(@Param('id') id: number) {
-        return this.roleService.getById({ id })
+        return this.roleService.findOne({ id }, ['permissions'])
     }
 
     @Post()
@@ -31,7 +31,7 @@ export class RoleController {
 
         await this.roleService.update(id, { name })
 
-        const role = await this.roleService.getById({ id })
+        const role = await this.roleService.findOne({ id })
 
         return this.roleService.create({
             ...role,

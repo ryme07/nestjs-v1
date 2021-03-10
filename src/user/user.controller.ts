@@ -17,8 +17,8 @@ export class UserController {
     constructor(private userService: UserService) { }
 
     @Get()
-    async all(@Query('page') page: number = 1): Promise<User[]> {
-        return this.userService.paginate(page)
+    async all(@Query('page') page: number = 1) {
+        return this.userService.paginate(page, ['role'])
     }
 
     @Post()
@@ -36,7 +36,7 @@ export class UserController {
 
     @Get(':id')
     async getById(@Param('id') id: number) {
-        return this.userService.findOne({ id })
+        return this.userService.findOne({ id }, ['role'])
     }
 
     @Put(':id')
@@ -44,7 +44,7 @@ export class UserController {
 
         const { role_id, ...data } = body;
 
-        await this.userService.updateUser(id, {
+        await this.userService.update(id, {
             ...data,
             role: { id: role_id }
         })
@@ -53,6 +53,6 @@ export class UserController {
 
     @Delete(':id')
     async deleteUser(@Param('id') id: number) {
-        return this.userService.deleteUser(id)
+        return this.userService.delete(id)
     }
 }
