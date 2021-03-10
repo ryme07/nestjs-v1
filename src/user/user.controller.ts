@@ -1,9 +1,13 @@
+import { UserUpdateDto } from './models/user-update.dto';
 import { UserCreateDto } from './models/user-create.dto';
 import { UserService } from './user.service';
-import { Body, ClassSerializerInterceptor, Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, Put, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User } from './models/user.entity';
 import * as bcrypt from "bcryptjs"
 import { AuthGuard } from 'src/auth/auth.guard';
+
+
+// Don't forget Exception Filters !! HERE
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)
@@ -31,5 +35,17 @@ export class UserController {
     @Get(':id')
     async getById(@Param('id') id: number) {
         return this.userService.findOne({ id })
+    }
+
+    @Put(':id')
+    async updateUser(@Param('id') id: number, @Body() body: UserUpdateDto) {
+
+        await this.userService.updateUser(id, body)
+        return this.userService.findOne({ id })
+    }
+
+    @Delete(':id')
+    async deleteUser(@Param('id') id: number) {
+        return this.userService.deleteUser(id)
     }
 }
