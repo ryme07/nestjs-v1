@@ -1,3 +1,4 @@
+import { CommonModule } from './../common/common.module';
 import { Permission } from './permission.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import { PermissionService } from './permission.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Permission]),
+    CommonModule
   ],
   controllers: [PermissionController],
   providers: [PermissionService]
